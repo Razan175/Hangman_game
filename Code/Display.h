@@ -1,4 +1,11 @@
-#include "proj.h"
+#include <stdio.h>
+#include <ctype.h>
+
+enum bool
+{ 
+    false, 
+    true 
+};
 
 void DisplayWord(const char word[], const enum bool guessed[]){
     printf("letter Guessed so far: ");

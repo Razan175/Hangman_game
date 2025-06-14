@@ -1,41 +1,42 @@
-/*The hangman game is one of the most famous games played on computers. The Rules of the game are as follows:
-
-1-There is given a word with omitted characters and you need to guess the characters to win the game.
-2-Only 3 chances are available and if you win the Man survives or Man gets hanged.
-*/
-// PROJ1
 
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "Display.h"
 
-#include "proj.c"
+#define WORDS_COUNT 100
+#define MAX_WORD_SIZE 10
+#define MAX_HINT_SIZE 100
 
-#define WORDS_COUNT 4
-
-struct WordWithHint {  
-  char* word;
-  char* hint;
+struct WordWithHint{  
+  char word[MAX_WORD_SIZE];  
+  char hint[MAX_HINT_SIZE];
 };
 
 enum bool guessed[26];
 
 int main() {
-    struct WordWithHint arr[WORDS_COUNT] = {
-    	{"Madrid", "Capital of a country in Europe"},
-    	{"Spoon", "Something we use while eating"},
-    	{"University", "A place where we hate to go :((("},
-    	{"Youtube", "A website we use to watch videos"},
-    };
-
     puts("HANGMAN GAME ^_^");
 
-    srand(time(0));
-    struct WordWithHint ranWord =  arr[rand() % WORDS_COUNT];
-    int wordSize = strlen(ranWord.word);
+    FILE* wordFile = fopen("../Words_File/random_words_with_hints.txt","r");
 
-    printf("We will help you with a hint : %s",ranWord.hint);
+    if (!wordFile)
+    {
+        perror("Could not open file\n");
+        return 1;
+    }
+    srand(time(0));
+    int n = rand() % WORDS_COUNT + 1;
+
+    struct WordWithHint randWord;
+    
+    for (int i = 0; i < n; i++)
+        fscanf(wordFile,"%s %[^\n]s",randWord.word,randWord.hint);
+
+    fclose(wordFile);
+    int wordSize = strlen(randWord.word);
+    printf("We will help you with a hint : %s",randWord.hint);
     
     int trials = 3;
     char gLetter;
@@ -45,7 +46,7 @@ int main() {
     {
         puts("");
         DrawHangman(trials);
-        DisplayWord(ranWord.word, guessed);
+        DisplayWord(randWord.word, guessed);
         
         puts("Enter a guess:");
 
@@ -72,7 +73,7 @@ int main() {
         
         for (int i = 0; i < wordSize; i++)
         {
-            if (toupper(ranWord.word[i]) == gLetter)
+            if (toupper(randWord.word[i]) == gLetter)
             {
                 flag = 1;
                 break;
@@ -86,7 +87,7 @@ int main() {
         {   
            for (int i = 0; i < wordSize; i++)
             {
-                if (guessed[toupper(ranWord.word[i]) - 'A'] == false)
+                if (guessed[toupper(randWord.word[i]) - 'A'] == false)
                 {
                      printf("Nice guess! %i trial(s) left", trials);
                     break;
@@ -95,7 +96,7 @@ int main() {
                 {
                     trials = 0;
                     puts("Yaaaaaaaayy , you guessed it right");
-                    printf("The word is: %s\n", ranWord.word);
+                    printf("The word is: %s\n", randWord.word);
                 }
             }
         }
